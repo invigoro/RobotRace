@@ -10,6 +10,7 @@ from threading import Timer
 import socket
 import threading
 import queue
+from colordict import colorDict
 
 face_cascade = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
 eye_cascade = cv.CascadeClassifier('haarcascade_eye.xml')
