@@ -57,6 +57,21 @@ def detectFaces(self, img):
         #roi_color = img[y:y+h, x:x+w]
         #eyes = eye_cascade.detectMultiScale(roi_gray)
     return faces
+
+
+def detectLines(self, img):
+    lower_pink = np.array([100, 140, 70], dtype=np.uint8)
+    upper_pink = np.array([200, 160, 255], dtype=np.uint8)
+
+    lower_white = np.array([0, 0, 0], dtype=np.uint8)
+    upper_white = np.array([0, 0, 255], dtype=np.uint8)
+
+    hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+    mask1 = cv.inRange(hsv, lower_pink, upper_pink)
+    mask2 = cv.inRange(hsv, lower_white, upper_white)
+    mask = cv.bitwise_or(mask1, mask2)
+    res = cv.bitwise_and(img, img, mask=mask)
+
 '''
 class ClientSocket(threading.Thread):
     def __init__(self, IP, PORT):
