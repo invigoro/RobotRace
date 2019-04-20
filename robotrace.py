@@ -12,6 +12,10 @@ import threading
 import queue
 from colordict import colorDict
 
+
+#for erosion/dilation
+kernel = np.ones((5,5), np.uint8)
+
 face_cascade = cv.CascadeClassifier('haarcascade_frontalface_default.xml')
 eye_cascade = cv.CascadeClassifier('haarcascade_eye.xml')
 
@@ -185,6 +189,15 @@ class Control():
         time.sleep(.3)
         self.motors = 6000
         self.tango.setTarget(MOTORS, self.motors)
+    def crossLine(self):
+        speed = 1000
+        self.motors -= speed
+        self.tango.setTarget(MOTORS, self.motors)
+        print("Cross Line")
+        time.sleep(1)
+        self.motors += speed
+        self.tango.setTarget(MOTORS, self.motors)
+
     def backward(self):
         self.motors = 7000
         self.tango.setTarget(MOTORS, self.motors)
@@ -231,6 +244,11 @@ class Control():
             else:
                 self.tiltDown()
             self.turnRight()
+    
+    def tiltHeadDownMax(self):
+        self.headTilt = 1510
+        self.tango.setTarget(HEADTILT, self.headTilt)
+
 
     def alignMoveToFace(self, face):
         global faceSize, faceSizeTolerance, faceTolerance, centerx, centery
@@ -292,25 +310,77 @@ def add(a, b):
         val.append(a[i] + b[i])
     return np.array(val)
 
-
-'''whiteMin = colorDict['white']['val'] - colorDict['white']['tol']
-whiteMax = colorDict['white']['val'] + colorDict['white']['tol']
-pinkMin = colorDict['pink']['val'] - colorDict['pink']['tol']
-pinkMax = colorDict['pink']['val'] + colorDict['pink']['tol']
-orangeMin = colorDict['orange']['val'] - colorDict['orange']['tol']
-orangeMax = colorDict['orange']['val'] + colorDict['orange']['tol']'''
-
-whiteMin = subtract(colorDict['white']['val'], colorDict['white']['tol'])
+'''whiteMin = subtract(colorDict['white']['val'], colorDict['white']['tol'])
 whiteMax = add(colorDict['white']['val'], colorDict['white']['tol'])
 pinkMin = subtract(colorDict['pink']['val'], colorDict['pink']['tol'])
 pinkMax = add(colorDict['pink']['val'], colorDict['pink']['tol'])
 orangeMin = subtract(colorDict['orange']['val'], colorDict['orange']['tol'])
-orangeMax = add(colorDict['orange']['val'], colorDict['orange']['tol'])
+orangeMax = add(colorDict['orange']['val'], colorDict['orange']['tol'])'''
+
+lineCentered = False
+
+def moveToLine(hue, tol, img, controller): #target hue, tolerance, image to mask, and robot controller
+    global lineCentered
+    colorMin = subtract(hue, tol)
+    colorMax = add(hue,tol)
+
+    blur = cv.blur(img, (5,5))
+
+    hsv = cv.cvtColor(blur, cv.COLOR_BGR2HSV)
+    mask1 = cv.inRange(hsv, colorMin, colorMax)
+    #res = cv.bitwise_and(img, img, mask=mask)
+
+    img_erosion = cv.erode(mask1, kernel, iterations=3)    #erode white
+    img_dilation = cv.dilate(img_erosion, kernel, iterations=4) #dilate black
+
+    #find COG and draw it
+    moments = cv.moments(img_dilation, True)
+
+
+    try:
+        cx = int(moments['m10'] / moments['m00'])
+        cy = int(moments['m01'] / moments['m00'])
+        if abs(cx - centerx) < 32:
+            lineCentered = True
+            #move forward
+            controller.forward()
+        elif cx > centerx:
+            #rotate right
+            controller.right()
+            lineCentered = False
+        else:
+            controller.left()
+            lineCentered = False
+        time.sleep(0.1)
+    except: #no line detected so we'll just keep rotatin'
+        if lineCentered is True:
+            controller.crossLine()
+            return True
+        cx = 0
+        cy = 0
+        print("No detected line")
+        controller.right()
+        lineCentered = False
+        time.sleep(0.2)
+
+
+    print(str(cx) + " " + str(cy))
+    cv.circle(img, (cx, cy), 8, (0,0,255), -1)
+    return False
+    
+    
+
 
 controller = Control()
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
     img = frame.array
+    if(moveToLine(colorDict['pink']['val'], colorDict['pink']['tol'], img, controller)) is True:
+        rawCapture.truncate(0)
+        break
+
+
+    '''
     hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV) #convert to HSV
     white = cv.inRange(hsv, whiteMin, whiteMax)
     pink = cv.inRange(hsv, pinkMin, pinkMax)
@@ -322,7 +392,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     cv.imshow('Orange', orange)
 
     print(whiteMin)
-    print(whiteMax)
+    print(whiteMax)'''
 
     key = cv.waitKey(1) & 0xFF
 
