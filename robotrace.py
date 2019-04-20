@@ -57,7 +57,7 @@ def detectFaces(self, img):
         #roi_color = img[y:y+h, x:x+w]
         #eyes = eye_cascade.detectMultiScale(roi_gray)
     return faces
-
+'''
 class ClientSocket(threading.Thread):
     def __init__(self, IP, PORT):
         super(ClientSocket, self).__init__()
@@ -104,7 +104,7 @@ class ClientSocket(threading.Thread):
 
 IP = '10.200.35.21'
 PORT = 5010
-client = ClientSocket(IP, PORT)
+client = ClientSocket(IP, PORT)'''
 ##client.start()
 speech = "It goes it goes it goes it goes it goes YUH"
 key = None
@@ -261,7 +261,49 @@ class Control():
                     return False
         return True
 
+def subtract(a, b):
+    if len(a) is not len(b):
+        return False
+    val = []
+    for i in range(0, len(a)):
+        val.append(a[i] - b[i])
+    return np.array(val)
     
+'''whiteMin = colorDict['white']['val'] - colorDict['white']['tol']
+whiteMax = colorDict['white']['val'] + colorDict['white']['tol']
+pinkMin = colorDict['pink']['val'] - colorDict['pink']['tol']
+pinkMax = colorDict['pink']['val'] + colorDict['pink']['tol']
+orangeMin = colorDict['orange']['val'] - colorDict['orange']['tol']
+orangeMax = colorDict['orange']['val'] + colorDict['orange']['tol']'''
 
+whiteMin = subtract(colorDict['white']['val'], colorDict['white']['tol'])
+whiteMax = subtract(colorDict['white']['val'], colorDict['white']['tol'])
+pinkMin = subtract(colorDict['pink']['val'], colorDict['pink']['tol'])
+pinkMax = subtract(colorDict['pink']['val'], colorDict['pink']['tol'])
+orangeMin = subtract(colorDict['orange']['val'], colorDict['orange']['tol'])
+orangeMax = subtract(colorDict['orange']['val'], colorDict['orange']['tol'])
 
 controller = Control()
+
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+    img = frame.array
+    hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV) #convert to HSV
+    white = cv.inRange(hsv, whiteMin, whiteMax)
+    pink = cv.inRange(hsv, pinkMin, pinkMax)
+    orange = cv.inRange(hsv, orangeMin, orangeMax)
+    
+    cv.imshow("Video", img)
+    cv.imshow("White", white)
+    cv.imshow("Pink", pink)
+    cv.imshow('Orange', orange)
+
+    key = cv.waitKey(1) & 0xFF
+
+    # clear the stream in preparation for the next frame
+    rawCapture.truncate(0)
+
+    # if the `q` key was pressed, break from the loop
+    if key == ord("q") or key == 27:
+            break
+
+cv.destroyAllWindows()
