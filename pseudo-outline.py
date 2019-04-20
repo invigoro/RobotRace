@@ -37,7 +37,31 @@ for loop, get current frame:
                 turn right
             else:
                 turn at random I guess
+    elif pink in frame:
+        turn around
+    elif white in frame: 
+        turn
+    else:
+        move forward
     
+for loop, get current frame:
+    search for faces
+    move to face
+    hold out hand
+
+for loop, get current frame:
+    if(ice in hand is right color):
+        close hand
+        nod head
+        speak
+        break
+    elif(ice in hand is wrong color):
+        shake head
+
+repeat first for loop with orange rather than pink
+
+repeat second for loop with pink rather than orange
+
+for loop, get current frame:
+    if pink (bin) in frame: 
         
-            
-            
