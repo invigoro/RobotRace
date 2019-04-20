@@ -268,7 +268,16 @@ def subtract(a, b):
     for i in range(0, len(a)):
         val.append(a[i] - b[i])
     return np.array(val)
-    
+
+def add(a, b):
+    if len(a) is not len(b):
+        return False
+    val = []
+    for i in range(0, len(a)):
+        val.append(a[i] + b[i])
+    return np.array(val)
+
+
 '''whiteMin = colorDict['white']['val'] - colorDict['white']['tol']
 whiteMax = colorDict['white']['val'] + colorDict['white']['tol']
 pinkMin = colorDict['pink']['val'] - colorDict['pink']['tol']
@@ -277,11 +286,11 @@ orangeMin = colorDict['orange']['val'] - colorDict['orange']['tol']
 orangeMax = colorDict['orange']['val'] + colorDict['orange']['tol']'''
 
 whiteMin = subtract(colorDict['white']['val'], colorDict['white']['tol'])
-whiteMax = subtract(colorDict['white']['val'], colorDict['white']['tol'])
+whiteMax = add(colorDict['white']['val'], colorDict['white']['tol'])
 pinkMin = subtract(colorDict['pink']['val'], colorDict['pink']['tol'])
-pinkMax = subtract(colorDict['pink']['val'], colorDict['pink']['tol'])
+pinkMax = add(colorDict['pink']['val'], colorDict['pink']['tol'])
 orangeMin = subtract(colorDict['orange']['val'], colorDict['orange']['tol'])
-orangeMax = subtract(colorDict['orange']['val'], colorDict['orange']['tol'])
+orangeMax = add(colorDict['orange']['val'], colorDict['orange']['tol'])
 
 controller = Control()
 
@@ -296,6 +305,9 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     cv.imshow("White", white)
     cv.imshow("Pink", pink)
     cv.imshow('Orange', orange)
+
+    print(whiteMin)
+    print(whiteMax)
 
     key = cv.waitKey(1) & 0xFF
 
