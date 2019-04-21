@@ -65,18 +65,18 @@ class Control():
             self.headTilt = 4100
         self.tango.setTarget(HEADTILT, self.headTilt)
     def left(self):
-        self.turn += 1000
+        self.turn += 1200
         self.tango.setTarget(TURN, self.turn)
         print("LEFT")
         time.sleep(.25)
-        self.turn -= 1000
+        self.turn -= 1200
         self.tango.setTarget(TURN, self.turn)
     def right(self):
-        self.turn -= 1000
+        self.turn -= 1200
         self.tango.setTarget(TURN, self.turn)
         print("RIGHT")
         time.sleep(.25)
-        self.turn += 1000
+        self.turn += 1200
         self.tango.setTarget(TURN, self.turn)
     def forward(self):
         self.motors = 4800
@@ -185,7 +185,7 @@ class Control():
 
     
     def tiltHeadDownMax(self):
-        self.headTilt = 1510
+        self.headTilt = 4400
         self.tango.setTarget(HEADTILT, self.headTilt)
 
 

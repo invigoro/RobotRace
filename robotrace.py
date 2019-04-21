@@ -114,7 +114,6 @@ def lookForColor(hue, tol, img):
     return False
     
 
-
 def moveToLine(hue, tol, img, controller): #target hue, tolerance, image to mask, and robot controller
     colorMin = subtract(hue, tol)
     colorMax = add(hue,tol)
@@ -136,7 +135,7 @@ def moveToLine(hue, tol, img, controller): #target hue, tolerance, image to mask
     try:
         cx = int(moments['m10'] / moments['m00'])
         cy = int(moments['m01'] / moments['m00'])
-        if abs(cx - centerx) < 20:
+        if abs(cx - centerx) < 30:
             controller.crossLine()
             return True
             #move forward
@@ -162,6 +161,9 @@ def moveToLine(hue, tol, img, controller): #target hue, tolerance, image to mask
 
 controller.elbowReset()
 controller.tiltHeadDownMax()
+
+time.sleep(5)#wait for motors to catch up?
+
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
     img = frame.array
     if(moveToLine(colorDict['orange']['val'], colorDict['orange']['tol'], img, controller)) is True:
