@@ -111,6 +111,29 @@ class Control():
         self.turnLeft()
         time.sleep(0.5)
 
+    def nodHead(self):
+        self.tiltUp()
+        time.sleep(0.5)
+        self.tiltDown()
+        time.sleep(0.5)
+        self.tiltUp()
+        time.sleep(0.5)
+        self.tiltDown()
+        time.sleep(0.5)
+
+    def waistRight(self):
+        self.body += 200
+        if(self.body > 7900):
+            self.body = 7900
+        self.tango.setTarget(BODY, self.body)
+        print("waist right")
+    def waistLeft(self):
+        self.body -= 200
+        if(self.body < 4100):
+            self.body = 4100
+        self.tango.setTarget(BODY, self.body)
+        print("waist left")
+        
     #ARMS?
     def shoulderUp(self):
         self.shoulder += 500
@@ -156,9 +179,9 @@ class Control():
         print("searching")
         headTilt = self.headTilt
         headTurn = self.headTurn
-        if(headTilt >= 7900):
+        if(headTilt >= 7000):
             self.resetSearchTilt = True
-        if(headTilt <= 4100):
+        if(headTilt <= 5000):
             self.resetSearchTilt = False
 
         resetPan = self.resetSearchPan

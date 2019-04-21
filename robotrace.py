@@ -247,6 +247,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
     if lookForColor(colorDict['hotpink']['val'], colorDict['hotpink']['tol'], img):
         print("That's the right color")
+        #client.sendData("Oh yeah, there's the right color. Give me that PLEASE")
+        controller.nodHead()
         break
 
 
