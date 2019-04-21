@@ -40,6 +40,8 @@ direction = 1
 
 globalVar = ""
 
+foundBox = False
+
 def setKey(self):
     print('key')
 
@@ -159,12 +161,66 @@ def moveToLine(hue, tol, img, controller): #target hue, tolerance, image to mask
     cv.imshow("Original", img)
     return False
 
+
+def moveToBox(hue, tol, img, controller): # target hue, tolerance, image to mask, and robot controller
+    global foundBox
+    colorMin = subtract(hue, tol)
+    colorMax = add(hue, tol)
+
+    blur = cv.blur(img, (5, 5))
+
+    hsv = cv.cvtColor(blur, cv.COLOR_BGR2HSV)
+    mask1 = cv.inRange(hsv, colorMin, colorMax)
+    # res = cv.bitwise_and(img, img, mask=mask)
+
+    img_erosion = cv.erode(mask1, kernel, iterations=3)  # erode white
+    img_dilation = cv.dilate(img_erosion, kernel, iterations=4)  # dilate black
+    cv.imshow("Dilation", img_dilation)
+
+    # find COG and draw it
+    moments = cv.moments(img_dilation, True)
+
+    try:
+        cx = int(moments['m10'] / moments['m00'])
+        cy = int(moments['m01'] / moments['m00'])
+        tolerance = 30
+        if abs(cx - centerx) < tolerance:
+            controller.forward()
+            foundBox = True
+            # move forward
+        elif cx > centerx:
+            # rotate right
+            controller.right()
+        else:
+            controller.left()
+        time.sleep(0.1)
+    except:  # no line detected so we'll just keep rotatin'
+        cx = 0
+        cy = 0
+        print("No detected line")
+        if foundBox == True:
+            for i in range(0, 2):
+                controller.forward()
+            for i in range(0, 2):
+                controller.waistLeft()
+            controller.handReset()
+            controller.handOpen()
+            return True
+        controller.right()
+        time.sleep(0.2)
+
+    print(str(cx) + " " + str(cy))
+    cv.circle(img, (cx, cy), 8, (0, 0, 255), -1)
+
+    cv.imshow("Original", img)
+    return False
+
 controller.elbowReset()
 controller.tiltHeadDownMax()
 
 time.sleep(5)#wait for motors to catch up?
 
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+"""for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
     img = frame.array
     if(moveToLine(colorDict['orange']['val'], colorDict['orange']['tol'], img, controller)) is True:
         rawCapture.truncate(0)
@@ -250,7 +306,28 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         #client.sendData("Oh yeah, there's the right color. Give me that PLEASE")
         controller.nodHead()
         break
+"""
 
+controller.resetHead()
+controller.tiltHeadDownMax()
+controller.resetWaist()
+
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+    img = frame.array
+    if(moveToBox(colorDict['hotpink']['val'], colorDict['hotpink']['tol'], img, controller)) is True:
+        rawCapture.truncate(0)
+        #client.sendData("Entering mining area")
+        break
+
+    key = cv.waitKey(1) & 0xFF
+
+    # clear the stream in preparation for the next frame
+    rawCapture.truncate(0)
+
+    # if the `q` key was pressed, break from the loop
+    if key == ord("q") or key == 27:
+        cv.destroyAllWindows()
+        break
 
 time.sleep(4)
 controller.handReset()
