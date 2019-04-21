@@ -121,6 +121,9 @@ class Control():
         self.tiltDown()
         time.sleep(0.5)
 
+    def resetWaist(self):
+        self.body = 6000
+        self.tango.setTarget(BODY, self.body)
     def waistRight(self):
         self.body += 200
         if(self.body > 7900):
