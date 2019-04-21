@@ -1,3 +1,9 @@
+from time import sleep
+from threading import Timer
+import socket
+import threading
+import queue
+
 class ClientSocket(threading.Thread):
     def __init__(self, IP, PORT):
         super(ClientSocket, self).__init__()

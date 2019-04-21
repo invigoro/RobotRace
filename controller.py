@@ -1,3 +1,16 @@
+import cv2 as cv
+import numpy as np
+import maestro
+import time
+from time import sleep
+from threading import Timer
+
+MOTORS = 1
+TURN = 2
+BODY = 0
+HEADTILT = 4
+HEADTURN = 3
+
 class Control():
     def __init__(self):
         self.tango = maestro.Controller()
@@ -39,18 +52,18 @@ class Control():
             self.headTilt = 4100
         self.tango.setTarget(HEADTILT, self.headTilt)
     def left(self):
-        self.turn += 1000
+        self.turn += 1300
         self.tango.setTarget(TURN, self.turn)
         print("LEFT")
         time.sleep(.25)
-        self.turn -= 1000
+        self.turn -= 1300
         self.tango.setTarget(TURN, self.turn)
     def right(self):
-        self.turn -= 1000
+        self.turn -= 1300
         self.tango.setTarget(TURN, self.turn)
         print("RIGHT")
         time.sleep(.25)
-        self.turn += 1000
+        self.turn += 1300
         self.tango.setTarget(TURN, self.turn)
     def forward(self):
         self.motors = 5000

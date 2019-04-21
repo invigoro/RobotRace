@@ -35,12 +35,6 @@ rawCapture = PiRGBArray(camera, size=(640, 480))
 centerx = 640 / 2
 centery = 480 / 2
 
-MOTORS = 1
-TURN = 2
-BODY = 0
-HEADTILT = 4
-HEADTURN = 3
-
 degreeTot = 0
 direction = 1
 
@@ -117,6 +111,7 @@ def moveToLine(hue, tol, img, controller): #target hue, tolerance, image to mask
 
     img_erosion = cv.erode(mask1, kernel, iterations=3)    #erode white
     img_dilation = cv.dilate(img_erosion, kernel, iterations=4) #dilate black
+    cv.imshow("Dilation", img_dilation)
 
     #find COG and draw it
     moments = cv.moments(img_dilation, True)
@@ -151,11 +146,13 @@ def moveToLine(hue, tol, img, controller): #target hue, tolerance, image to mask
 
     print(str(cx) + " " + str(cy))
     cv.circle(img, (cx, cy), 8, (0,0,255), -1)
+    
+    cv.imshow("Original", img)
     return False
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
     img = frame.array
-    if(moveToLine(colorDict['pink']['val'], colorDict['pink']['tol'], img, controller)) is True:
+    if(moveToLine(colorDict['orange']['val'], colorDict['orange']['tol'], img, controller)) is True:
         rawCapture.truncate(0)
         #client.sendData("Entering mining area")
         break
