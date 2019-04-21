@@ -124,13 +124,13 @@ class Control():
     def resetWaist(self):
         self.body = 6000
         self.tango.setTarget(BODY, self.body)
-    def waistRight(self):
+    def waistLeft(self):
         self.body += 200
         if(self.body > 7900):
             self.body = 7900
         self.tango.setTarget(BODY, self.body)
         print("waist right")
-    def waistLeft(self):
+    def waistRight(self):
         self.body -= 200
         if(self.body < 4100):
             self.body = 4100
