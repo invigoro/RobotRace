@@ -1,8 +1,17 @@
+# import the necessary packages
+from picamera.array import PiRGBArray
+from picamera import PiCamera
+import time
 import cv2 as cv
 import numpy as np
+import maestro
+
+camera = PiCamera()
+camera.resolution = (640, 480)
+camera.framerate = 32
+rawCapture = PiRGBArray(camera, size=(640, 480))
 
 #primary windows
-cap = cv.VideoCapture(0)
 cv.namedWindow("Video")
 cv.namedWindow("HSV")
 cv.namedWindow("BW")
@@ -45,9 +54,9 @@ cv.createTrackbar("Sat Tol.", "HSV", 0, 255, change_sat)
 cv.createTrackbar("Val Tol.", "HSV", 0, 255, change_val)
 cv.setMouseCallback("HSV", mouseCall, hsv)
 
-while True:
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
-    status, img = cap.read() #read in video
+    img = frame.array
     hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV) #convert to HSV
     bw = cv.inRange(hsv, minHSV, maxHSV)    #black and white image to track stuff
     img_erosion = cv.erode(bw, kernel, iterations=2)    #erode white
@@ -59,9 +68,14 @@ while True:
     cv.imshow("BW", bw)
     cv.imshow('Erosion', img_erosion)
     cv.imshow('Dilation', img_dilation)
-    k = cv.waitKey(1)
-    if k == 27:
-        break
+    key = cv.waitKey(1) & 0xFF
+
+    # clear the stream in preparation for the next frame
+    rawCapture.truncate(0)
+
+    # if the `q` key was pressed, break from the loop
+    if key == ord("q") or key == 27:
+            break
 
     #get current positions of three trackbars
     h = cv.getTrackbarPos('Hue Tol.', 'HSV')
