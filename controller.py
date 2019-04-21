@@ -10,7 +10,7 @@ TURN = 2
 BODY = 0
 HEADTILT = 4
 HEADTURN = 3
-SHOULDER = 7
+SHOULDER = 6
 ELBOW = 8
 HAND = 11
 
@@ -146,7 +146,7 @@ class Control():
         self.hand = 6000
         self.tango.setTarget(HAND, self.hand)
     def elbowUpMax(self):
-        self.elbow = 7600
+        self.elbow = 7900
         self.tango.setTarget(ELBOW, self.elbow)
     def elbowReset(self):
         self.elbow = 6000

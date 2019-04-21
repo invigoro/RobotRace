@@ -105,14 +105,14 @@ def lookForColor(hue, tol, img):
     img_erosion = cv.erode(mask1, kernel, iterations=3)    #erode white
     img_dilation = cv.dilate(img_erosion, kernel, iterations=4) #dilate black
 
-    ___, contours, ___ = cv.findContours(img_dilation, 1, 2)
+    contours, hierarchy = cv.findContours(img_dilation, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
     for i in contours:
         if cv.contourArea(i) > areaThreshold:
             return True
 
+    cv.imshow("Original", img)
     return False
     
-    cv.imshow("Original", img)
 
 
 def moveToLine(hue, tol, img, controller): #target hue, tolerance, image to mask, and robot controller
@@ -136,7 +136,7 @@ def moveToLine(hue, tol, img, controller): #target hue, tolerance, image to mask
     try:
         cx = int(moments['m10'] / moments['m00'])
         cy = int(moments['m01'] / moments['m00'])
-        if abs(cx - centerx) < 32:
+        if abs(cx - centerx) < 20:
             controller.crossLine()
             return True
             #move forward
@@ -160,8 +160,9 @@ def moveToLine(hue, tol, img, controller): #target hue, tolerance, image to mask
     cv.imshow("Original", img)
     return False
 
+controller.elbowReset()
 controller.tiltHeadDownMax()
-'''for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
     img = frame.array
     if(moveToLine(colorDict['orange']['val'], colorDict['orange']['tol'], img, controller)) is True:
         rawCapture.truncate(0)
@@ -193,7 +194,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     # if the `q` key was pressed, break from the loop
     if key == ord("q") or key == 27:
         cv.destroyAllWindows()
-        break'''
+        break
 
 controller.resetHead()
 
@@ -224,10 +225,12 @@ print("end of face tracking")
 controller.elbowUpMax()
 controller.handReset()
 controller.tiltHeadDownMax()
+controller.handOpen()
+controller.handOpen()
 print("Please give me some ice")
 #client.sendData("Please please please please please please please please please give me some pink ice. I am but a poor street urchin with no ice of my own.")
 
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True) and not (key == ord('q') or key ==27): #Loop to wait for pink ice
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to wait for pink ice
     img = frame.array
 
     key = cv.waitKey(1) & 0xFF
@@ -241,10 +244,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         break
 
     if lookForColor(colorDict['hotpink']['val'], colorDict['hotpink']['tol'], img):
+        print("That's the right color")
         break
 
 
-time.sleep(5)
+time.sleep(4)
+controller.handReset()
 controller.handClose()
+
 
 cv.destroyAllWindows()
