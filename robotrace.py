@@ -174,64 +174,31 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         cv.destroyAllWindows()
         break'''
 
-while(True):
-    controller.resetHead()
-    key = None
+controller.resetHead()
 
-    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
-        timer = None
-        img = frame.array
-        key = cv.waitKey(1) & 0xFF
-        if key == ord("q") or key == 27:
-            break
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+    img = frame.array
 
-        faces = detectFaces(img)
-        if(faces is False):
-            controller.searchForFaces()
-            time.sleep(0.5)
-        elif(controller.alignMoveToFace(faces) is False):
-            time.sleep(1)
-            break
-        cv.imshow("Image", img)
-        rawCapture.truncate(0)
-    
-    print("start of second loop")
-    rawCapture.truncate(0)        
+    key = cv.waitKey(1) & 0xFF
 
-    if key == ord("q") or key == 27:
-        break
-
-    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to check if human has left frame
-        img = frame.array
-        if key == ord("q") or key == 27:
-            break
-        key = cv.waitKey(1) & 0xFF
-        if key == ord("q") or key == 27:
-            break
-        elif(timer is None):
-            print("reached this one")
-            timer = Timer(t, setKey)
-            timer.start()
-            print("reached this too")
-        elif(not timer.is_alive()):
-            break
-        else:
-            print("reached the other loop")
-            faces = detectFaces(img)
-            if(faces is not False):
-                controller.alignFace(faces)
-                print("reset timer")
-                timer.cancel()
-                timer = Timer(t, setKey)
-                timer.start()
-        if key == ord("q") or key == 27:
-            break
-        cv.imshow("Image", img)
-        rawCapture.truncate(0)
+    # clear the stream in preparation for the next frame
     rawCapture.truncate(0)
 
+    # if the `q` key was pressed, break from the loop
     if key == ord("q") or key == 27:
+        cv.destroyAllWindows()
         break
+
+    faces = detectFaces(img)
+    if(faces is False):
+        controller.searchForFaces()
+        time.sleep(0.5)
+    elif(controller.alignMoveToFace(faces) is False):
+        time.sleep(1)
+        break
+    cv.imshow("Image", img)
+    
+print("end of face tracking")
 
 controller.elbowUpMax()
 controller.tiltHeadDownMax()
