@@ -40,20 +40,23 @@ direction = 1
 
 globalVar = ""
 
-
 def setKey(g):
     global key
     key = g
 
-def detectFaces(self, img):
+def detectFaces(img):
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    thereAreSome = False
     #print(faces)
     for (x,y,w,h) in faces:
         cv.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+        thereAreSome = True
         #roi_gray = gray[y:y+h, x:x+w]
         #roi_color = img[y:y+h, x:x+w]
         #eyes = eye_cascade.detectMultiScale(roi_gray)
+    if thereAreSome is False:
+        return False
     return faces
 
 
@@ -88,13 +91,6 @@ def add(a, b):
     for i in range(0, len(a)):
         val.append(a[i] + b[i])
     return np.array(val)
-
-'''whiteMin = subtract(colorDict['white']['val'], colorDict['white']['tol'])
-whiteMax = add(colorDict['white']['val'], colorDict['white']['tol'])
-pinkMin = subtract(colorDict['pink']['val'], colorDict['pink']['tol'])
-pinkMax = add(colorDict['pink']['val'], colorDict['pink']['tol'])
-orangeMin = subtract(colorDict['orange']['val'], colorDict['orange']['tol'])
-orangeMax = add(colorDict['orange']['val'], colorDict['orange']['tol'])'''
 
 lineCentered = False
 
@@ -144,7 +140,8 @@ def moveToLine(hue, tol, img, controller): #target hue, tolerance, image to mask
     cv.imshow("Original", img)
     return False
 
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+controller.tiltHeadDownMax()
+'''for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
     img = frame.array
     if(moveToLine(colorDict['orange']['val'], colorDict['orange']['tol'], img, controller)) is True:
         rawCapture.truncate(0)
@@ -176,6 +173,91 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     # if the `q` key was pressed, break from the loop
     if key == ord("q") or key == 27:
         cv.destroyAllWindows()
+        break'''
+
+while(True):
+    controller.resetHead()
+    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+        img = frame.array
+        key = cv.waitKey(1) & 0xFF
+        if key == ord("q") or key == 27:
+            break
+        else:
+            faces = detectFaces(img)
+            if faces is not False:
+                timer = None
+                break
+            else:
+                controller.searchForFaces()
+                time.sleep(0.5)
+        cv.imshow("Image", img)
+        rawCapture.truncate(0)
+
+    rawCapture.truncate(0)
+    if key == ord("q") or key == 27:
         break
+
+    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+        img = frame.array
+        key = cv.waitKey(1) & 0xFF
+        if key == ord("q") or key == 27:
+            break
+
+        faces = detectFaces(img)
+        if(faces is False):
+            controller.searchForFaces()
+            time.sleep(0.5)
+        elif(controller.alignMoveToFace(faces) is False):
+            time.sleep(1)
+            #print(speech)
+            #print(client)
+            #client.sendData(speech)
+            break
+        cv.imshow("Image", img)
+        rawCapture.truncate(0)
+    
+    print("start of third loop")
+    rawCapture.truncate(0)        
+
+    if key == ord("q") or key == 27:
+        break
+
+    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to check if human has left frame
+        img = frame.array
+        if key == ord("q") or key == 27:
+            break
+        key = cv.waitKey(1) & 0xFF
+        if key == ord("q") or key == 27:
+            break
+        elif(timer is None):
+            print("reached this one")
+            timer = Timer(t, setKey)
+            timer.start()
+            print("reached this too")
+        elif(not timer.is_alive()):
+            break
+        else:
+            print("reached the other loop")
+            faces = detectFaces(img)
+            if(faces is not False):
+                print("reset timer")
+                timer.cancel()
+                timer = Timer(t, setKey)
+                timer.start()
+        if key == ord("q") or key == 27:
+            break
+        cv.imshow("Image", img)
+        rawCapture.truncate(0)
+    rawCapture.truncate(0)
+
+    if key == ord("q") or key == 27:
+        break
+
+controller.elbowUpMax()
+controller.tiltHeadDownMax()
+print("Please give me some ice")
+#client.sendData("Please please please please please please please please please give me some pink ice. I am but a poor street urchin with no ice of my own.")
+
+
 
 cv.destroyAllWindows()

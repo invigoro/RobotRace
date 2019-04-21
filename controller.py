@@ -14,6 +14,13 @@ SHOULDER = 7
 ELBOW = 8
 HAND = 11
 
+faceSize = 20000
+faceSizeTolerance = 5000
+faceTolerance = 40
+
+centerx = 640 / 2
+centery = 480 / 2
+
 class Control():
     def __init__(self):
         self.tango = maestro.Controller()
@@ -72,7 +79,7 @@ class Control():
         self.turn += 1000
         self.tango.setTarget(TURN, self.turn)
     def forward(self):
-        self.motors = 5000
+        self.motors = 4800
         self.tango.setTarget(MOTORS, self.motors)
         print(str(self.motors) + " MOVE")
         time.sleep(.3)
@@ -135,6 +142,12 @@ class Control():
         if(self.hand > 1510):
             self.hand = 1510
         self.tango.setTarget(HAND, self.hand)
+    def elbowUpMax(self):
+        self.elbow = 7600
+        self.tango.setTarget(ELBOW, self.elbow)
+    def elbowReset(self):
+        self.elbow = 6000
+        self.tango.setTarget(ELBOW, self.elbow)
         
     def searchForFaces(self):
         headTilt = self.headTilt
@@ -175,7 +188,7 @@ class Control():
         global faceSize, faceSizeTolerance, faceTolerance, centerx, centery
         largest = 0
         current = None
-        for (x,y,w,h) in faces:
+        for (x,y,w,h) in face:
             if(w*h) > largest:
                 largest = w*h
                 current = [int(x+(w/2)), int(y+(h/2))]
