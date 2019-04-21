@@ -142,6 +142,9 @@ class Control():
         if(self.hand > 1510):
             self.hand = 1510
         self.tango.setTarget(HAND, self.hand)
+    def handReset(self):
+        self.hand = 6000
+        self.tango.setTarget(HAND, self.hand)
     def elbowUpMax(self):
         self.elbow = 7600
         self.tango.setTarget(ELBOW, self.elbow)

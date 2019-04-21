@@ -91,10 +91,31 @@ def add(a, b):
         val.append(a[i] + b[i])
     return np.array(val)
 
-lineCentered = False
+
+def lookForColor(hue, tol, img):
+    areaThreshold = 100
+    colorMin = subtract(hue, tol)
+    colorMax = add(hue, tol)
+
+    blur = cv.blur(img, (5,5))
+
+    hsv = cv.cvtColor(blur, cv.COLOR_BGR2HSV)
+    mask1 = cv.inRange(hsv, colorMin, colorMax)
+
+    img_erosion = cv.erode(mask1, kernel, iterations=3)    #erode white
+    img_dilation = cv.dilate(img_erosion, kernel, iterations=4) #dilate black
+
+    ___, contours, ___ = cv.findContours(img_dilation, 1, 2)
+    for i in contours:
+        if cv.contourArea(i) > areaThreshold:
+            return True
+
+    return False
+    
+    cv.imshow("Original", img)
+
 
 def moveToLine(hue, tol, img, controller): #target hue, tolerance, image to mask, and robot controller
-    global lineCentered
     colorMin = subtract(hue, tol)
     colorMax = add(hue,tol)
 
@@ -201,10 +222,29 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 print("end of face tracking")
 
 controller.elbowUpMax()
+controller.handReset()
 controller.tiltHeadDownMax()
 print("Please give me some ice")
 #client.sendData("Please please please please please please please please please give me some pink ice. I am but a poor street urchin with no ice of my own.")
 
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True) and not (key == ord('q') or key ==27): #Loop to wait for pink ice
+    img = frame.array
 
+    key = cv.waitKey(1) & 0xFF
+
+    # clear the stream in preparation for the next frame
+    rawCapture.truncate(0)
+
+    # if the `q` key was pressed, break from the loop
+    if key == ord("q") or key == 27:
+        cv.destroyAllWindows()
+        break
+
+    if lookForColor(colorDict['hotpink']['val'], colorDict['hotpink']['tol'], img):
+        break
+
+
+time.sleep(5)
+controller.handClose()
 
 cv.destroyAllWindows()
