@@ -40,9 +40,8 @@ direction = 1
 
 globalVar = ""
 
-def setKey(g):
-    global key
-    key = g
+def setKey(self):
+    print('key')
 
 def detectFaces(img):
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -177,27 +176,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
 while(True):
     controller.resetHead()
-    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
-        img = frame.array
-        key = cv.waitKey(1) & 0xFF
-        if key == ord("q") or key == 27:
-            break
-        else:
-            faces = detectFaces(img)
-            if faces is not False:
-                timer = None
-                break
-            else:
-                controller.searchForFaces()
-                time.sleep(0.5)
-        cv.imshow("Image", img)
-        rawCapture.truncate(0)
-
-    rawCapture.truncate(0)
-    if key == ord("q") or key == 27:
-        break
+    key = None
 
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+        timer = None
         img = frame.array
         key = cv.waitKey(1) & 0xFF
         if key == ord("q") or key == 27:
@@ -209,14 +191,11 @@ while(True):
             time.sleep(0.5)
         elif(controller.alignMoveToFace(faces) is False):
             time.sleep(1)
-            #print(speech)
-            #print(client)
-            #client.sendData(speech)
             break
         cv.imshow("Image", img)
         rawCapture.truncate(0)
     
-    print("start of third loop")
+    print("start of second loop")
     rawCapture.truncate(0)        
 
     if key == ord("q") or key == 27:
@@ -240,6 +219,7 @@ while(True):
             print("reached the other loop")
             faces = detectFaces(img)
             if(faces is not False):
+                controller.alignFace(faces)
                 print("reset timer")
                 timer.cancel()
                 timer = Timer(t, setKey)

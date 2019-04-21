@@ -14,9 +14,9 @@ SHOULDER = 7
 ELBOW = 8
 HAND = 11
 
-faceSize = 20000
-faceSizeTolerance = 5000
-faceTolerance = 40
+faceSize = 10000
+faceSizeTolerance = 2500
+faceTolerance = 100
 
 centerx = 640 / 2
 centery = 480 / 2
@@ -42,25 +42,25 @@ class Control():
         self.tango.setTarget(HEADTILT, self.headTilt)
         print("RESET HEAD")
 
-    def turnRight(self):
-        self.headTurn += 500
+    def turnLeft(self):
+        self.headTurn += 250
         if(self.headTurn > 7900):
             self.headTurn = 7900
-        self.tango.setTarget(HEADTURN, self.headTurn)   
-        print("TURN HEAD RIGHT")
-    def turnLeft(self):
-        self.headTurn -= 500
+        self.tango.setTarget(HEADTURN, self.headTurn)
+        print("TURN HEAD LEFT")
+    def turnRight(self):
+        self.headTurn -= 250
         if(self.headTurn < 4100):
             self.headTurn = 4100
         self.tango.setTarget(HEADTURN, self.headTurn)
-        print('TURN HEAD LEFT')        
+        print('TURN HEAD RIGHT')  
     def tiltUp(self):
-        self.headTilt += 500
+        self.headTilt += 250
         if(self.headTilt > 7900):
             self.headTilt = 7900
         self.tango.setTarget(HEADTILT, self.headTilt)
     def tiltDown(self):
-        self.headTilt -= 500
+        self.headTilt -= 250
         if(self.headTilt < 4100):
             self.headTilt = 4100
         self.tango.setTarget(HEADTILT, self.headTilt)
@@ -150,6 +150,7 @@ class Control():
         self.tango.setTarget(ELBOW, self.elbow)
         
     def searchForFaces(self):
+        print("searching")
         headTilt = self.headTilt
         headTurn = self.headTurn
         if(headTilt >= 7900):
@@ -161,23 +162,24 @@ class Control():
         resetTilt = self.resetSearchTilt
 
         if(headTurn < 7900 and resetPan is False):
-            self.turnRight()
+            self.turnLeft()
         elif(headTurn >= 7900 and resetPan is False):
             self.resetSearchPan = True
             if(resetTilt is False):
                 self.tiltUp()
             else:
                 self.tiltDown()
-            self.turnLeft()
+            self.turnRight()
         elif(headTurn > 4100 and resetPan is True):
-            self.turnLeft()
+            self.turnRight()
         elif(headTurn <= 4100 and resetPan is True):
             self.resetSearchPan = False
             if(resetTilt is False):
                 self.tiltUp()
             else:
                 self.tiltDown()
-            self.turnRight()
+            self.turnLeft()
+
     
     def tiltHeadDownMax(self):
         self.headTilt = 1510
@@ -192,40 +194,52 @@ class Control():
             if(w*h) > largest:
                 largest = w*h
                 current = [int(x+(w/2)), int(y+(h/2))]
-        if(self.headTurn < 5900):    #head turned left
-            if(current[0] - centerx > faceTolerance):   #human is to the right
-                controller.turnRight()
-            elif(current[0] - centerx < -faceTolerance): #human is even farther left
-                controller.left()
-            else:   #human is centered but head is turned, so we turn body in opposite directions to fix
-                controller.turnRight()
-                controller.left()
-        elif(self.headTurn > 6100): #head turned right
-            if(current[0] - centerx > faceTolerance): #human is even father right
-                controller.right()
-            elif(current[0] - centerx < -faceTolerance): #human is to the left
-                controller.turnLeft()
-            else:   #human is centered but head is turned, so we turn body in opposite directions to fix
-                controller.turnLeft()
-                controller.left()
-        elif(current[0] - centerx > faceTolerance): #human is to the right and head not turned
-            controller.right()
-        elif(current[0] - centerx < -faceTolerance):    #human is to the left and head not turned
-            controller.left()   
+        if(current[1] - centery > faceTolerance):
+            self.tiltDown()
+        elif(current[1] - centery < -faceTolerance):
+            self.tiltUp()
         else:
-            if(current[1] - centery > faceTolerance):
-                controller.tiltUp()
-            elif(current[1] - centery < -faceTolerance):
-                controller.tiltDown()
+            if(current[0] - centerx > faceTolerance): #too far right
+                print("too far left, turn body right")
+                self.right()
+            elif(centerx - current[0] > faceTolerance): #too far left
+                print("too far right, turn body left")
+                self.left()
+            elif(self.headTurn < 5900):
+                print("head is turned right, turning it left now yeet")
+                self.turnLeft()
+            elif(self.headTurn > 6100):
+                print("head is turned left, turning it right now")
+                self.turnRight()
             else:
                 if(largest > faceSize + faceSizeTolerance): #human too big
                     print("Go backward")
-                    #controller.backward()
+                    self.backward()
                 elif(largest < faceSize - faceSizeTolerance):
                     print("Go forward")
-                    #controller.forward()
+                    self.forward()
                 else:
                     return False
         return True
+
+
+    def alignFace(self, face):
+        global faceSize, faceSizeTolerance, faceTolerance, centerx, centery
+        largest = 0
+        current = None
+        for (x,y,w,h) in face:
+            if(w*h) > largest:
+                largest = w*h
+                current = [int(x+(w/2)), int(y+(h/2))]
+        if(current[1] - centery > faceTolerance):
+            self.tiltDown()
+        elif(current[1] - centery < -faceTolerance):
+            self.tiltUp()
+        elif(current[0] - centerx > faceTolerance): #too far right
+            print("too far left, turn head right")
+            self.turnRight()
+        elif(centerx - current[0] > faceTolerance): #too far left
+            print("too far right, turn head left")
+            self.turnLeft()
 
 controller = Control()
