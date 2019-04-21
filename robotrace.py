@@ -121,26 +121,20 @@ def moveToLine(hue, tol, img, controller): #target hue, tolerance, image to mask
         cx = int(moments['m10'] / moments['m00'])
         cy = int(moments['m01'] / moments['m00'])
         if abs(cx - centerx) < 32:
-            lineCentered = True
+            controller.crossLine()
+            return True
             #move forward
-            controller.forward()
         elif cx > centerx:
             #rotate right
             controller.right()
-            lineCentered = False
         else:
             controller.left()
-            lineCentered = False
         time.sleep(0.1)
     except: #no line detected so we'll just keep rotatin'
-        if lineCentered is True:
-            controller.crossLine()
-            return True
         cx = 0
         cy = 0
         print("No detected line")
         controller.right()
-        lineCentered = False
         time.sleep(0.2)
 
 
@@ -156,19 +150,23 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         rawCapture.truncate(0)
         #client.sendData("Entering mining area")
         break
-    '''
-    hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV) #convert to HSV
-    white = cv.inRange(hsv, whiteMin, whiteMax)
-    pink = cv.inRange(hsv, pinkMin, pinkMax)
-    orange = cv.inRange(hsv, orangeMin, orangeMax)
-    
-    cv.imshow("Video", img)
-    cv.imshow("White", white)
-    cv.imshow("Pink", pink)
-    cv.imshow('Orange', orange)
 
-    print(whiteMin)
-    print(whiteMax)'''
+    key = cv.waitKey(1) & 0xFF
+
+    # clear the stream in preparation for the next frame
+    rawCapture.truncate(0)
+
+    # if the `q` key was pressed, break from the loop
+    if key == ord("q") or key == 27:
+        cv.destroyAllWindows()
+        break
+
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+    img = frame.array
+    if(moveToLine(colorDict['orange']['val'], colorDict['orange']['tol'], img, controller)) is True:
+        rawCapture.truncate(0)
+        #client.sendData("Entering mining area")
+        break
 
     key = cv.waitKey(1) & 0xFF
 

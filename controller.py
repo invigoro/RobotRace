@@ -10,6 +10,9 @@ TURN = 2
 BODY = 0
 HEADTILT = 4
 HEADTURN = 3
+SHOULDER = 7
+ELBOW = 8
+HAND = 11
 
 class Control():
     def __init__(self):
@@ -19,6 +22,9 @@ class Control():
         self.headTilt = 6000
         self.motors = 6000
         self.turn = 6000
+        self.shoulder = 6000
+        self.elbow = 6000
+        self.hand = 6000
         self.resetSearchPan = False
         self.resetSearchTilt = False
     
@@ -52,18 +58,18 @@ class Control():
             self.headTilt = 4100
         self.tango.setTarget(HEADTILT, self.headTilt)
     def left(self):
-        self.turn += 1300
+        self.turn += 1000
         self.tango.setTarget(TURN, self.turn)
         print("LEFT")
         time.sleep(.25)
-        self.turn -= 1300
+        self.turn -= 1000
         self.tango.setTarget(TURN, self.turn)
     def right(self):
-        self.turn -= 1300
+        self.turn -= 1000
         self.tango.setTarget(TURN, self.turn)
         print("RIGHT")
         time.sleep(.25)
-        self.turn += 1300
+        self.turn += 1000
         self.tango.setTarget(TURN, self.turn)
     def forward(self):
         self.motors = 5000
@@ -77,7 +83,7 @@ class Control():
         self.motors -= speed
         self.tango.setTarget(MOTORS, self.motors)
         print("Cross Line")
-        time.sleep(1)
+        time.sleep(2.7)
         self.motors += speed
         self.tango.setTarget(MOTORS, self.motors)
 
@@ -97,6 +103,38 @@ class Control():
         time.sleep(0.5)
         self.turnLeft()
         time.sleep(0.5)
+
+    #ARMS?
+    def shoulderUp(self):
+        self.shoulder += 500
+        if(self.shoulder > 7900):
+            self.shoulder = 7900
+        self.tango.setTarget(SHOULDER, self.shoulder)
+    def shoulderDown(self):
+        self.shoulder -= 500
+        if(self.shoulder > 1510):
+            self.shoulder = 1510
+        self.tango.setTarget(SHOULDER, self.shoulder)
+    def elbowOpen(self):
+        self.elbow += 500
+        if(self.elbow > 7900):
+            self.elbow = 7900
+        self.tango.setTarget(ELBOW, self.elbow)
+    def elbowClose(self):
+        self.elbow -= 500
+        if(self.elbow > 1510):
+            self.elbow = 1510
+        self.tango.setTarget(ELBOW, self.elbow)
+    def handClose(self):
+        self.hand += 500
+        if(self.hand > 7900):
+            self.hand = 7900
+        self.tango.setTarget(HAND, self.hand)
+    def handOpen(self):
+        self.hand -= 500
+        if(self.hand > 1510):
+            self.hand = 1510
+        self.tango.setTarget(HAND, self.hand)
         
     def searchForFaces(self):
         headTilt = self.headTilt
