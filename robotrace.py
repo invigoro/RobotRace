@@ -256,5 +256,8 @@ time.sleep(4)
 controller.handReset()
 controller.handClose()
 
+for i in range(0, 8):
+    controller.right()
+
 
 cv.destroyAllWindows()
