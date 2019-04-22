@@ -136,6 +136,14 @@ class Control():
             self.body = 4100
         self.tango.setTarget(BODY, self.body)
         print("waist left")
+
+    def setWaist(self, num):
+        if num > 7900:
+            num = 7900
+        if num < 4100:
+            num - 4100
+        self.body = num
+        self.tango.setTarget(BODY, self.body)
         
     #ARMS?
     def shoulderUp(self):
