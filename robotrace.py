@@ -12,6 +12,7 @@ import threading
 import queue
 from colordict import colorDict
 from controller import controller
+from raceclient import client
 
 #for erosion/dilation
 kernel = np.ones((5,5), np.uint8)

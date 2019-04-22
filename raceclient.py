@@ -48,8 +48,7 @@ class ClientSocket(threading.Thread):
         exit()
             
 
-IP = '10.200.35.21'
+IP = '10.200.50.179'
 PORT = 5010
 client = ClientSocket(IP, PORT)
 client.start()
-speech = "It goes it goes it goes it goes it goes YUH"
