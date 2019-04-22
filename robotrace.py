@@ -238,11 +238,12 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         cv.destroyAllWindows()
         break
 
+#client.sendData("Entered rock field")
+
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
     img = frame.array
     if(moveToLine(colorDict['orange']['val'], colorDict['orange']['tol'], img, controller)) is True:
         rawCapture.truncate(0)
-        #client.sendData("Entering mining area")
         break
 
     key = cv.waitKey(1) & 0xFF
@@ -256,6 +257,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         break
 
 controller.resetHead()
+#client.sendData("Entered mining area")
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
     img = frame.array
@@ -318,9 +320,46 @@ for i in range(0, 8):
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
     img = frame.array
-    if(moveToBox(colorDict['hotpink']['val'], colorDict['hotpink']['tol'], img, controller)) is True:
+    if(moveToLine(colorDict['orange']['val'], colorDict['orange']['tol'], img, controller)) is True:
         rawCapture.truncate(0)
         #client.sendData("Entering mining area")
+        break
+
+    key = cv.waitKey(1) & 0xFF
+
+    # clear the stream in preparation for the next frame
+    rawCapture.truncate(0)
+
+    # if the `q` key was pressed, break from the loop
+    if key == ord("q") or key == 27:
+        cv.destroyAllWindows()
+        break
+
+#client.sendData("Entered rock field")
+
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+    img = frame.array
+    if(moveToLine(colorDict['orange']['val'], colorDict['orange']['tol'], img, controller)) is True:
+        rawCapture.truncate(0)
+        break
+
+    key = cv.waitKey(1) & 0xFF
+
+    # clear the stream in preparation for the next frame
+    rawCapture.truncate(0)
+
+    # if the `q` key was pressed, break from the loop
+    if key == ord("q") or key == 27:
+        cv.destroyAllWindows()
+        break
+
+#client.sendData("Entered start area")
+
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+    img = frame.array
+    if(moveToBox(colorDict['hotpink']['val'], colorDict['hotpink']['tol'], img, controller)) is True:
+        rawCapture.truncate(0)
+        #client.sendData("Found the box")
         break
 
     key = cv.waitKey(1) & 0xFF
