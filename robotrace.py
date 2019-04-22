@@ -184,7 +184,7 @@ def moveToBox(hue, tol, img, controller): # target hue, tolerance, image to mask
     try:
         cx = int(moments['m10'] / moments['m00'])
         cy = int(moments['m01'] / moments['m00'])
-        tolerance = 30
+        tolerance = 35
         if abs(cx - centerx) < tolerance:
             controller.forward()
             foundBox = True
@@ -312,7 +312,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         client.sendData("Oh yeah, there's the right color. Give me that PLEASE")
         controller.nodHead()
         break
-        
+
 time.sleep(4)
 controller.handReset()
 controller.handClose()
