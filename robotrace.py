@@ -219,6 +219,7 @@ def moveToBox(hue, tol, img, controller): # target hue, tolerance, image to mask
 
 controller.elbowReset()
 controller.tiltHeadDownMax()
+controller.resetWaist()
 
 time.sleep(5)#wait for motors to catch up?
 
@@ -226,7 +227,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     img = frame.array
     if(moveToLine(colorDict['orange']['val'], colorDict['orange']['tol'], img, controller)) is True:
         rawCapture.truncate(0)
-        #client.sendData("Entering mining area")
         break
 
     key = cv.waitKey(1) & 0xFF
@@ -239,7 +239,9 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         cv.destroyAllWindows()
         break
 
-#client.sendData("Entered rock field")
+time.sleep(3)
+
+client.sendData("Entered rock field")
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
     img = frame.array
@@ -258,7 +260,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         break
 
 controller.resetHead()
-#client.sendData("Entered mining area")
+client.sendData("Entered mining area")
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
     img = frame.array
@@ -290,7 +292,7 @@ controller.tiltHeadDownMax()
 controller.handOpen()
 controller.handOpen()
 print("Please give me some ice")
-#client.sendData("Please please please please please please please please please give me some pink ice. I am but a poor street urchin with no ice of my own.")
+client.sendData("Please please please please please please please please please give me some pink ice. I am but a poor street urchin with no ice of my own.")
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to wait for pink ice
     img = frame.array
@@ -307,10 +309,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
     if lookForColor(colorDict['hotpink']['val'], colorDict['hotpink']['tol'], img):
         print("That's the right color")
-        #client.sendData("Oh yeah, there's the right color. Give me that PLEASE")
+        client.sendData("Oh yeah, there's the right color. Give me that PLEASE")
         controller.nodHead()
         break
-
+        
+time.sleep(4)
+controller.handReset()
+controller.handClose()
 
 controller.resetHead()
 controller.tiltHeadDownMax()
@@ -319,11 +324,11 @@ controller.resetWaist()
 for i in range(0, 8):
     controller.right()
 
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to center orange line
     img = frame.array
     if(moveToLine(colorDict['orange']['val'], colorDict['orange']['tol'], img, controller)) is True:
         rawCapture.truncate(0)
-        #client.sendData("Entering mining area")
+        client.sendData("Entering mining area")
         break
 
     key = cv.waitKey(1) & 0xFF
@@ -338,7 +343,9 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
 #client.sendData("Entered rock field")
 
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+time.sleep(3)
+
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to center orange line
     img = frame.array
     if(moveToLine(colorDict['orange']['val'], colorDict['orange']['tol'], img, controller)) is True:
         rawCapture.truncate(0)
@@ -354,13 +361,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         cv.destroyAllWindows()
         break
 
-#client.sendData("Entered start area")
+client.sendData("Entered start area")
 
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to find pink box
     img = frame.array
     if(moveToBox(colorDict['hotpink']['val'], colorDict['hotpink']['tol'], img, controller)) is True:
         rawCapture.truncate(0)
-        #client.sendData("Found the box")
+        client.sendData("Found the box")
         break
 
     key = cv.waitKey(1) & 0xFF
@@ -373,9 +380,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         cv.destroyAllWindows()
         break
 
-time.sleep(4)
+time.sleep(2)
 controller.handReset()
 controller.handClose()
+controller.resetWaist()
 
 
 cv.destroyAllWindows()

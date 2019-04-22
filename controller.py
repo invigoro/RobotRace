@@ -65,18 +65,18 @@ class Control():
             self.headTilt = 4100
         self.tango.setTarget(HEADTILT, self.headTilt)
     def left(self):
-        self.turn += 1200
+        self.turn += 1000
         self.tango.setTarget(TURN, self.turn)
         print("LEFT")
         time.sleep(.25)
-        self.turn -= 1200
+        self.turn -= 1000
         self.tango.setTarget(TURN, self.turn)
     def right(self):
-        self.turn -= 1200
+        self.turn -= 1000
         self.tango.setTarget(TURN, self.turn)
         print("RIGHT")
         time.sleep(.25)
-        self.turn += 1200
+        self.turn += 1000
         self.tango.setTarget(TURN, self.turn)
     def forward(self):
         self.motors = 4800
@@ -122,7 +122,7 @@ class Control():
         time.sleep(0.5)
 
     def resetWaist(self):
-        self.body = 6000
+        self.body = 5300
         self.tango.setTarget(BODY, self.body)
     def waistLeft(self):
         self.body += 500
