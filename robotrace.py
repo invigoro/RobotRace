@@ -204,6 +204,7 @@ def moveToBox(hue, tol, img, controller): # target hue, tolerance, image to mask
             for i in range(0, 2):
                 controller.waistLeft()
             controller.handReset()
+            controller.elbowUpMax()
             controller.handOpen()
             return True
         controller.right()
@@ -220,7 +221,7 @@ controller.tiltHeadDownMax()
 
 time.sleep(5)#wait for motors to catch up?
 
-"""for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
     img = frame.array
     if(moveToLine(colorDict['orange']['val'], colorDict['orange']['tol'], img, controller)) is True:
         rawCapture.truncate(0)
@@ -306,11 +307,14 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         #client.sendData("Oh yeah, there's the right color. Give me that PLEASE")
         controller.nodHead()
         break
-"""
+
 
 controller.resetHead()
 controller.tiltHeadDownMax()
 controller.resetWaist()
+
+for i in range(0, 8):
+    controller.right()
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
     img = frame.array
@@ -332,9 +336,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 time.sleep(4)
 controller.handReset()
 controller.handClose()
-
-for i in range(0, 8):
-    controller.right()
 
 
 cv.destroyAllWindows()
