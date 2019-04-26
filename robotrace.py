@@ -135,6 +135,7 @@ def moveToLine(hue, tol, img, controller): #target hue, tolerance, image to mask
     moments = cv.moments(img_dilation, True)
 
 
+
     try:
         cx = int(moments['m10'] / moments['m00'])
         cy = int(moments['m01'] / moments['m00'])
@@ -184,7 +185,7 @@ def moveToBox(hue, tol, img, controller): # target hue, tolerance, image to mask
     try:
         cx = int(moments['m10'] / moments['m00'])
         cy = int(moments['m01'] / moments['m00'])
-        tolerance = 35
+        tolerance = 40
         if abs(cx - centerx) < tolerance:
             controller.forward()
             foundBox = True
@@ -200,7 +201,7 @@ def moveToBox(hue, tol, img, controller): # target hue, tolerance, image to mask
         cy = 0
         print("No detected line")
         if foundBox == True:
-            for i in range(0, 2):
+            for i in range(0, 4):
                 controller.forward()
             for i in range(0, 2):
                 controller.waistLeft()
@@ -221,7 +222,7 @@ controller.elbowReset()
 controller.tiltHeadDownMax()
 controller.resetWaist()
 
-time.sleep(5)#wait for motors to catch up?
+time.sleep(12)#wait for motors to catch up? (had to change for mac, its slow stuff)
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to look for humans
     img = frame.array
@@ -239,7 +240,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         cv.destroyAllWindows()
         break
 
-time.sleep(3)
+time.sleep(4)
 
 client.sendData("Entered rock field")
 
@@ -292,7 +293,7 @@ controller.tiltHeadDownMax()
 controller.handOpen()
 controller.handOpen()
 print("Please give me some ice")
-client.sendData("Please please please please please please please please please give me some pink ice. I am but a poor street urchin with no ice of my own.")
+client.sendData("Please give me some pink ice. I am but a poor street urchin with no ice of my own.")
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to wait for pink ice
     img = frame.array
@@ -309,11 +310,12 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
     if lookForColor(colorDict['hotpink']['val'], colorDict['hotpink']['tol'], img):
         print("That's the right color")
-        client.sendData("Oh yeah, there's the right color. Give me that PLEASE")
+        client.sendData("Oh yeah, there's the right color. yum yum")
+        time.sleep(3)
         controller.nodHead()
         break
 
-time.sleep(4)
+time.sleep(5)
 controller.handReset()
 controller.handClose()
 
@@ -321,7 +323,7 @@ controller.resetHead()
 controller.tiltHeadDownMax()
 controller.resetWaist()
 
-for i in range(0, 8):
+for i in range(0, 9):
     controller.right()
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to center orange line
@@ -343,7 +345,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
 #client.sendData("Entered rock field")
 
-time.sleep(3)
+time.sleep(4)
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to center orange line
     img = frame.array
@@ -361,6 +363,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         cv.destroyAllWindows()
         break
 
+time.sleep(3)
 client.sendData("Entered start area")
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #Loop to find pink box

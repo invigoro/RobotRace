@@ -65,18 +65,18 @@ class Control():
             self.headTilt = 4100
         self.tango.setTarget(HEADTILT, self.headTilt)
     def left(self):
-        self.turn += 1300
+        self.turn += 1100
         self.tango.setTarget(TURN, self.turn)
         print("LEFT")
         time.sleep(.25)
-        self.turn -= 1300
+        self.turn -= 1100
         self.tango.setTarget(TURN, self.turn)
     def right(self):
-        self.turn -= 1300
+        self.turn -= 1100
         self.tango.setTarget(TURN, self.turn)
         print("RIGHT")
         time.sleep(.25)
-        self.turn += 1300
+        self.turn += 1100
         self.tango.setTarget(TURN, self.turn)
     def forward(self):
         self.motors = 4800
@@ -90,7 +90,7 @@ class Control():
         self.motors -= speed
         self.tango.setTarget(MOTORS, self.motors)
         print("Cross Line")
-        time.sleep(2.7)
+        time.sleep(2.6)
         self.motors += speed
         self.tango.setTarget(MOTORS, self.motors)
 
@@ -122,7 +122,7 @@ class Control():
         time.sleep(0.5)
 
     def resetWaist(self):
-        self.body = 5300
+        self.body = 5800
         self.tango.setTarget(BODY, self.body)
     def waistLeft(self):
         self.body += 500
@@ -162,22 +162,22 @@ class Control():
             self.elbow = 7900
         self.tango.setTarget(ELBOW, self.elbow)
     def elbowClose(self):
-        self.elbow -= 500
+        self.elbow -= 1000
         if(self.elbow > 1510):
             self.elbow = 1510
         self.tango.setTarget(ELBOW, self.elbow)
     def handClose(self):
-        self.hand += 500
+        self.hand += 1300
         if(self.hand > 7900):
             self.hand = 7900
         self.tango.setTarget(HAND, self.hand)
     def handOpen(self):
-        self.hand -= 500
+        self.hand -= 1300
         if(self.hand > 1510):
             self.hand = 1510
         self.tango.setTarget(HAND, self.hand)
     def handReset(self):
-        self.hand = 6000
+        self.hand = 5000
         self.tango.setTarget(HAND, self.hand)
     def elbowUpMax(self):
         self.elbow = 7900

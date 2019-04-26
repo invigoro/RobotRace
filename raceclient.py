@@ -48,7 +48,7 @@ class ClientSocket(threading.Thread):
         exit()
             
 
-IP = '10.200.50.179'
+IP = '10.200.23.235'
 PORT = 5010
 client = ClientSocket(IP, PORT)
 client.start()
